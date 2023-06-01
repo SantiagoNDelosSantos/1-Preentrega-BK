@@ -1,12 +1,9 @@
 import fs from "fs";
-import {
-    v4 as uuidV4
-} from 'uuid'
+import {  v4 as uuidV4 } from 'uuid'
 
 const path = "src/classes/files/products.json";
 
 export default class ManagerProducts {
-
     consultarProductos = async () => {
         console.log("Existe.", fs.existsSync(path));
         if (fs.existsSync(path)) {
@@ -28,34 +25,53 @@ export default class ManagerProducts {
 
     consultarProductoPorId = async (id) => {
         const productos = await this.consultarProductos();
-        const producto = productos.find((producto) => {
-            return producto.id == id;
-        });
-        return producto ? producto : { product: "Producto no encontrado." };
+        const producto = productos.find((producto) => producto.id == id);
+
+        if (!producto) {
+            throw new Error("Producto no encontrado.");
+        }
+
+        return producto;
     };
 
     actualizarProducto = async (pid, updatedProduct) => {
-        const existingProduct = await this.consultarProductoPorId(pid);
+        const products = await this.consultarProductos();
+        const existingProduct = products.find((product) => product.id === pid);
+
+        if (!existingProduct) {
+            return {
+                error: "Producto no encontrado."
+            };
+        }
+
         const updatedProductData = {
             ...existingProduct,
             ...updatedProduct
         };
-        const products = await this.consultarProductos();
+
         const updatedProducts = products.map((product) => {
             if (product.id === pid) {
                 return updatedProductData;
             }
             return product;
         });
+
         await fs.promises.writeFile(path, JSON.stringify(updatedProducts, null, "\t"));
         return updatedProductData;
     };
 
     eliminarProducto = async (pid) => {
         const products = await this.consultarProductos();
+        const existingProduct = products.find((product) => product.id === pid);
+
+        if (!existingProduct) {
+            return {
+                error: "Producto no encontrado."
+            };
+        }
+
         const updatedProducts = products.filter((product) => product.id !== pid);
         await fs.promises.writeFile(path, JSON.stringify(updatedProducts, null, "\t"));
         return "Producto eliminado exitosamente.";
     };
-
 }
