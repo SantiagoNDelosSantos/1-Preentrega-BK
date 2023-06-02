@@ -2,38 +2,101 @@ import { Router } from "express";
 import ManagerProducts from "../classes/ProductsManager.class.js";
 
 const router = Router();
-
-const managerProducts = new ManagerProducts()
+const managerProducts = new ManagerProducts();
 
 router.get("/:id", async (req, res) => {
-    const id = req.params.id;
-    const product = await managerProducts.consultarProductoPorId(id);
-    res.send({ product });
+    try {
+        const id = req.params.id;
+        const product = await managerProducts.consultarProductoPorId(id);
+        if (!product) {
+            console.log(`No se encontró ningún producto con el ID ${id}.`)
+            res.status(404).json({
+                error: `No se encontró ningún producto con el ID ${id}.`
+            });
+        } else {
+            res.send({
+                product
+            });
+        }
+    } catch (error) {
+        console.error("Error:", error.message);
+        res.status(500).json({
+            error: "Error al consultar el producto. Por favor, inténtelo de nuevo más tarde."
+        });
+    }
 });
 
 router.get("/", async (req, res) => {
-    const products = await managerProducts.consultarProductos();
-    res.send({ products });
+    try {
+        const products = await managerProducts.consultarProductos();
+        res.send({
+            products
+        });
+    } catch (error) {
+        console.error("Error:", error.message);
+        res.status(500).json({
+            error: "Error al consultar los productos. Por favor, inténtelo de nuevo más tarde."
+        });
+    }
 });
 
 router.post("/", async (req, res) => {
-    console.log(req.body);
-    const product = req.body;
-    managerProducts.crearProducto(product);
-    res.send({ status: "Success."});
+    try {
+        console.log(req.body);
+        const product = req.body;
+        const createdProduct = await managerProducts.crearProducto(product);
+        res.send({
+            product: createdProduct
+        });
+    } catch (error) {
+        console.error("Error:", error.message);
+        res.status(500).json({
+            error: "Error al crear el producto. Por favor, inténtelo de nuevo más tarde."
+        });
+    }
 });
 
 router.put("/:pid", async (req, res) => {
-    const pid = req.params.pid;
-    const updatedFields = req.body;
-    const updatedProduct = await managerProducts.actualizarProducto(pid, updatedFields);
-    res.send( updatedProduct );
+    try {
+        const pid = req.params.pid;
+        const updatedFields = req.body;
+        const updatedProduct = await managerProducts.actualizarProducto(pid, updatedFields);
+
+        if (!updatedProduct) {
+            console.log(`No se encontró ningún producto con el ID ${pid}.`)
+            res.status(404).json({
+                error: `No se encontró ningún producto con el ID ${pid}.`
+            });
+        } else {
+            res.send(updatedProduct);
+        }
+    } catch (error) {
+        console.error("Error:", error.message);
+        res.status(500).json({
+            error: "Error al actualizar el producto. Por favor, inténtelo de nuevo más tarde."
+        });
+    }
 });
 
 router.delete("/:pid", async (req, res) => {
-    const pid = req.params.pid;
-    const result = await managerProducts.eliminarProducto(pid);
-    res.send(result);
+    try {
+        const pid = req.params.pid;
+        const result = await managerProducts.eliminarProducto(pid);
+
+        if (!result) {
+            console.log(`No se encontró ningún producto con el ID ${pid}.`)
+            res.status(404).json({
+                error: `No se encontró ningún producto con el ID ${pid}.`
+            });
+        } else {
+            res.send(result);
+        }
+    } catch (error) {
+        console.error("Error:", error.message);
+        res.status(500).json({
+            error: "Error al eliminar el producto. Por favor, inténtelo de nuevo más tarde."
+        });
+    }
 });
 
 export default router;

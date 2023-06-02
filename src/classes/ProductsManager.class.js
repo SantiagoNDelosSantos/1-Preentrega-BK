@@ -4,6 +4,7 @@ import {  v4 as uuidV4 } from 'uuid'
 const path = "src/classes/files/products.json";
 
 export default class ManagerProducts {
+
     consultarProductos = async () => {
         console.log("Existe.", fs.existsSync(path));
         if (fs.existsSync(path)) {
@@ -28,7 +29,7 @@ export default class ManagerProducts {
         const producto = productos.find((producto) => producto.id == id);
 
         if (!producto) {
-            throw new Error("Producto no encontrado.");
+            return null;
         }
 
         return producto;
@@ -39,9 +40,7 @@ export default class ManagerProducts {
         const existingProduct = products.find((product) => product.id === pid);
 
         if (!existingProduct) {
-            return {
-                error: "Producto no encontrado."
-            };
+            return null;
         }
 
         const updatedProductData = {
@@ -65,9 +64,7 @@ export default class ManagerProducts {
         const existingProduct = products.find((product) => product.id === pid);
 
         if (!existingProduct) {
-            return {
-                error: "Producto no encontrado."
-            };
+            return null;
         }
 
         const updatedProducts = products.filter((product) => product.id !== pid);
