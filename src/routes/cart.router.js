@@ -23,7 +23,6 @@ router.post("/", async (req, res) => {
 router.post('/:cid/products/:pid', async (req, res) => {
     const cartId = req.params.cid
     const productId = req.params.pid
-
     await managerCarts.agregarProductoEnCarrito(cartId, productId)
     res.send({status: 'Success.'})
 }); 
