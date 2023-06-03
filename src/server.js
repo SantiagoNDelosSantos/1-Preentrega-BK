@@ -3,13 +3,15 @@ import handlebars from "express-handlebars";
 import __dirname from "./utils.js";
 import viewsRouter from "./routes/views.router.js";
 import { Server } from 'socket.io';
-
+import routerProducts from './routes/products.router.js';
+import routerCart from './routes/cart.router.js'
 import ProductManager from "./classes/ProductsManager.class.js";
 
 // Iniciamos el servidor:
 const app = express();
 
 // Rutas extendidas:
+app.use(express.json());
 app.use(urlencoded({ extended: true }));
 
 // Configuración de archivos estáticos
@@ -25,7 +27,9 @@ const expressServer = app.listen(8080, () => {
     console.log(`Servidor iniciado en el puerto 8080.`);
 });
 
-// Rutas
+// Rutas:
+app.use('/api/products/', routerProducts)
+app.use('/api/carts/', routerCart)
 app.use('/', viewsRouter);
 
 

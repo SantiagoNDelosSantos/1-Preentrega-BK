@@ -6,6 +6,7 @@ const path = "src/classes/files/carts.json";
 export default class ManagerCarts {
 
     consultarCarts = async () => {
+        console.log("Existe.", fs.existsSync(path));
         if (fs.existsSync(path)) {
             const data = await fs.promises.readFile(path, "utf-8");
             const carts = JSON.parse(data);
@@ -17,8 +18,7 @@ export default class ManagerCarts {
 
     crearCart = async () => {
         const carts = await this.consultarCarts();
-        const newCart = { id: uuidV4(), products: [] };
-        carts.push(newCart);
+        carts.push({id: uuidV4(), products: [] });
         return await fs.promises.writeFile(path, JSON.stringify(carts, null, "\t"));
     };
 
@@ -31,7 +31,6 @@ export default class ManagerCarts {
     };
 
     agregarProductoEnCarrito = async (idCart, idProduct) => {
-        
         const cart = await this.consultarCartPorId(idCart);
         const index = cart.products.findIndex((product) => {
             return product.id == idProduct
