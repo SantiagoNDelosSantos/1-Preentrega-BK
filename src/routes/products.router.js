@@ -1,5 +1,5 @@
 import { Router } from "express";
-import ManagerProducts from "../classes/ProductsManager.class.js";
+import ManagerProducts from "../daos/mongodb/ProductsManager.class.js";
 
 const router = Router();
 const managerProducts = new ManagerProducts();
@@ -43,8 +43,14 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
         console.log(req.body);
+
         const product = req.body;
+
         const createdProduct = await managerProducts.crearProducto(product);
+        const products = await managerProducts.consultarProductos();
+
+        req.socketServer.sockets.emit('productos', products);
+
         res.send({
             product: createdProduct
         });
@@ -89,6 +95,10 @@ router.delete("/:pid", async (req, res) => {
                 error: `No se encontró ningún producto con el ID ${pid}.`
             });
         } else {
+            const products = await managerProducts.consultarProductos();
+
+            req.socketServer.sockets.emit('productos', products);
+    
             res.send(result);
         }
     } catch (error) {
